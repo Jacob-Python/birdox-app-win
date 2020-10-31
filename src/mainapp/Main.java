@@ -47,7 +47,7 @@ public class Main implements ActionListener {
                 System.exit(0);
             }
         } else {
-            popup("Missing updater or username file. Please reinstall Birdox.");
+            popup("Missing directory and/or username file. Please reinstall Birdox.");
         }
     }
 
@@ -66,6 +66,11 @@ public class Main implements ActionListener {
         loadLists();
         ui = new SwingUI();
         updatel();
+        try {
+            updnet();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private static void loadLists() {
