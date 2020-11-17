@@ -3,6 +3,7 @@ import java.awt.*;
 import java.net.URL;
 
 public class SwingUI {
+    JLabel slist;
     JTextField uf1;
     JTextField uf2;
     JTextField uf3;
@@ -45,14 +46,14 @@ public class SwingUI {
         header.setBounds(310, 10, 300, 150);
         header.setVisible(true);
         panel.add(header);
-        comp1l = new JLabel("<html><h4>List</h4>");
-        comp1l.setBounds(610, 100, 300, 150);
+        comp1l = new JLabel("<html><p>List&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Your places &mdash; and how they add up</p>");
+        comp1l.setBounds(610, 100, 800, 150);
         comp1l.setVisible(true);
         panel.add(comp1l);
         sep1 = new JSeparator();
         sep1.setOrientation(SwingConstants.VERTICAL);
         panel.add(sep1);
-        comp2l = new JLabel("<html><h4>Tools</h4><p>Delete bird (enter ID)&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&nbsp;Update selected bird <br>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&nbsp;&nbsp;&nbsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&nbsp;(enter ID, new date and place)</p><br><br><br><br><br><br><p><p>Add bird (enter name, date, and place)");
+        comp2l = new JLabel("<html><h4>Tools</h4><p>Delete bird (enter ID)&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&nbsp;Update selected bird <br>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&nbsp;&nbsp;&nbsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&nbsp;(enter ID, new place, and new date)</p><br><br><br><br><br><br><p><p>Add bird (enter name, place, and date)");
         comp2l.setBounds(60, 150, 450, 260);
         comp2l.setVisible(true);
         panel.add(comp2l);
@@ -123,5 +124,9 @@ public class SwingUI {
         bs1.setBounds(700, 670, 160, 30);
         bs1.addActionListener(new Main());
         panel.add(bs1);
+        slist = new JLabel("");
+        slist.setBorder(BorderFactory.createBevelBorder(1));
+        slist.setBounds(1100, 200, 200, 410);
+        panel.add(slist);
     }
 }

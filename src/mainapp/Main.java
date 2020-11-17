@@ -15,10 +15,14 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.text.DecimalFormat;
 import java.util.*;
 
 public class Main implements ActionListener {
     static Random rnd = new Random();
+    public static String percentl = "";
+    public static HashMap<String, Integer> placesp = new HashMap<>();
+    public static HashMap<String, ArrayList<String>> places = new HashMap<String, ArrayList<String>>();
     public static ArrayList<String[]> s = new ArrayList<String[]>();
     static int cnt = 0;
     public static ArrayList<String[]> birds = new ArrayList<>();
@@ -177,10 +181,11 @@ public class Main implements ActionListener {
             birdcat.set(groups.indexOf(g),bc);
         }
         int i=0;
+        htmld="<div style=\"float:right;\"><h2>Favorite places</h2><div style=\"border:2px solid black;width:500px;\">"+percentl+"</ul></div></div>";
         for (ArrayList<String[]> birdss : birdcat) {
             htmld = htmld + "<h2>"+groups.get(i)+"</h2>";
             for (String[] s : birdss) {
-                htmld = htmld + "<div style=\"border:2px solid black;\"><b><h3>" + s[0] + "</h3></b>";
+                htmld = htmld + "<div style=\"border:2px solid black;width:500px;\"><b><h3>" + s[0] + "</h3></b>";
                 htmld = htmld + "<p>Seen at: " + s[1] + "</p>";
                 htmld = htmld + "<p>Date: " + s[2] + "<p>";
                 if (rare(s[0])) {
@@ -285,9 +290,69 @@ public class Main implements ActionListener {
     }
 
     static void updatel(){
+        File plist = new File(apppath+"/plist.bdff");
+        Scanner lread1 = null;
+        try {
+            lread1 = new Scanner(plist);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        while (lread1.hasNextLine()) {
+            String name = lread1.nextLine();
+            lread1.nextLine();
+            ArrayList<String> rpl = new ArrayList<>();
+            for (int i = 0; i < 3; i ++) {
+                String data = lread1.nextLine();
+                if (!data.equals("null")) {
+                    rpl.add(data);
+                }
+                places.put(name, rpl);
+            }
+            lread1.nextLine();
+        }
+        placesp = new HashMap<>();
+        HashMap<String, ArrayList<String>> placesc = new HashMap<>(places);
+        Iterator it0 = placesc.entrySet().iterator();
+        while (it0.hasNext()) {
+            Map.Entry pair = (Map.Entry)it0.next();
+            String p = pair.getKey().toString();
+            placesp.put(p,0);
+            it0.remove();
+        }
+        placesp.put("Other",0);
+        ui.header.setText(String.format("<html><h1>Welcome to Birdox!</h1><h3>Made by birders, for birders.</h3><p>You have %s birds, %s of which are rare or uncommon.",birds.size(),rct()));
         ArrayList<String> names = new ArrayList<>();
         for (String[] s1 : birds){
-            names.add(s1[0]);
+            String fp = "Other";
+            String st=s1[0];
+            names.add(st);
+            Iterator it = places.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry)it.next();
+                String p = pair.getKey().toString();
+                ArrayList<String> k = (ArrayList<String>) pair.getValue();
+                boolean h=false;
+                for (String s : k){
+                    if (s1[1].toLowerCase().contains(s.toLowerCase())){
+                        h=true;
+                    }
+                }
+                if (h) {
+                    fp = p;
+                }
+            }
+            placesp.put(fp,placesp.get(fp)+1);
+        }
+        Iterator it = placesp.entrySet().iterator();
+        ArrayList<String> zslice = new ArrayList<>();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry)it.next();
+            if (((int)pair.getValue())==0){
+                zslice.add(((String)pair.getKey()));
+            }
+        }
+        for (String s : zslice){
+            placesp.remove(s);
         }
         ArrayList<String[]> ss = new ArrayList<>();
         names.sort(String::compareToIgnoreCase);
@@ -323,6 +388,14 @@ public class Main implements ActionListener {
         printvals();
     }
 
+    private static String rct() {
+        int c = 0;
+        for (String[] b : birds){
+            if (rare(b[0])) c++;
+        }
+        return String.valueOf(c);
+    }
+
     private static void createNewListFile() {
         File listFile = new File(apppath+"/list.bdff");
         try {
@@ -355,13 +428,16 @@ public class Main implements ActionListener {
         if (missingMasterlist()){
             try {
                 updateFiles();
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
         } else {
             File masterlist= new File(apppath+"/masterlist.bdff");
+            File plist= new File(apppath+"/plist.bdff");
             try {
                 masterlist.createNewFile();
+                plist.createNewFile();
                 updateFiles();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -384,11 +460,26 @@ public class Main implements ActionListener {
         } catch (InterruptedException interruptedException) {
             interruptedException.printStackTrace();
         }
+        FileWriter plist= new FileWriter(apppath+"/plist.bdff");
+        HttpClient client1 = HttpClient.newHttpClient();
+        HttpRequest request1 = HttpRequest.newBuilder().uri(URI.create("http://www.birdoxapp.tk/static/plist.bdff")).build();
+        HttpResponse<String> response1 = null;
+        try {
+            response1 = client1.send(request1, HttpResponse.BodyHandlers.ofString());
+            String res = response1.body();
+            plist.write(res);
+            plist.close();
+        } catch (IOException ioException) {
+            ioException.printStackTrace();
+        } catch (InterruptedException interruptedException) {
+            interruptedException.printStackTrace();
+        }
     }
 
     private static boolean missingMasterlist() {
         File masterlist= new File(apppath+"/masterlist.bdff");
-        return masterlist.exists();
+        File plist= new File(apppath+"/plist.bdff");
+        return masterlist.exists()&&plist.exists();
     }
 
 
@@ -403,6 +494,20 @@ public class Main implements ActionListener {
         }
         st=st+"</ul>";
         ui.list.setText(st);
+        String st1="<html><ul>";
+        Iterator it0 = placesp.entrySet().iterator();
+        while (it0.hasNext()) {
+            Map.Entry pair = (Map.Entry)it0.next();
+            String p = pair.getKey().toString();
+            float bc = ((Integer)pair.getValue()).floatValue();
+            float bs = birds.size();
+            DecimalFormat df = new DecimalFormat("#.##");
+            float i = (bc/bs)*100;
+            st1=st1+"<li><p>"+p+": "+df.format(i)+"%</p></li>";
+            it0.remove();
+        }
+        percentl=st1;
+        ui.slist.setText(st1);
     }
 
     private static String encrypt(String in, String key){

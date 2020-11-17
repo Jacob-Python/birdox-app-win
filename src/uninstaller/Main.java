@@ -16,14 +16,12 @@ public class Main implements ActionListener {
     private static JFrame frame;
     private static JPanel panel;
     private static JLabel header;
-    private static JTextField code;
-    private static JLabel inp_1;
     private static JButton submit;
     private static JLabel status;
     private static JButton close;
     private static String uid;
     private static boolean has = false;
-    private static String[] files = new String[]{"name.txt","masterlist.bdff","updatebirdox.exe","birdox.exe"};
+    private static String[] files = new String[]{"name.txt","masterlist.bdff","birdox.exe","favicon.ico"};
 
     public static void main(String[] args) throws FileNotFoundException {
         panel = new JPanel();
